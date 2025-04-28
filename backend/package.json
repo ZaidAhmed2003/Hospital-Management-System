@@ -1,10 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node src/server.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/server.js"
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "express": "^5.1.0",
     "express-mongo-sanitize": "^2.2.0",
     "helmet": "^8.1.0",
+    "http-status": "^2.1.0",
     "joi": "^17.13.3",
     "mongoose": "^8.14.0",
     "passport": "^0.7.0",
