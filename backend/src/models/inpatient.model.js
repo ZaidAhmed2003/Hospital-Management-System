@@ -7,12 +7,16 @@ const inpatientSchema = new mongoose.Schema(
       ref: "Patient",
       required: true,
     },
-    roomNumber: {
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Doctor",
+      required: true,
+    },
+    room: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",
       required: true,
     },
-
     admissionDate: {
       type: Date,
       required: true,
@@ -21,19 +25,34 @@ const inpatientSchema = new mongoose.Schema(
     dischargeDate: {
       type: Date,
     },
-    bedNumber: {
-      type: String,
-      required: true,
-    },
     diagnosis: {
       type: String,
       required: true,
+      trim: true,
     },
-    treatmentPlan: {
+    treatment: {
       type: String,
+      trim: true,
+    },
+    isDischarged: {
+      type: Boolean,
+      default: false,
+    },
+    totalBill: {
+      type: Number,
+      min: 0,
+    },
+    status: {
+      type: String,
+      enum: ["Admitted", "Under Treatment", "Discharged"],
+      default: "Admitted",
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
+
+const Inpatient = mongoose.model("Inpatient", inpatientSchema);
+
+module.exports = Inpatient;
