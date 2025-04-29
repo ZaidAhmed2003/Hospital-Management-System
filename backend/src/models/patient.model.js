@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const validator = require('validator');
 
-const doctorSchema = mongoose.Schema(
+const patientSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -17,21 +17,17 @@ const doctorSchema = mongoose.Schema(
     age: {
       type: Number,
       required: true,
-      min: 25,
-      max: 80,
+      min: 0,
+      max: 120,
     },
     gender: {
       type: String,
       enum: ['male', 'female', 'other', 'unknown'],
       required: true,
       default: 'unknown',
-    },
-    address: {
-      type: String,
-      required: true,
       trim: true,
     },
-    specialty: {
+    address: {
       type: String,
       required: true,
       trim: true,
@@ -58,14 +54,33 @@ const doctorSchema = mongoose.Schema(
         }
       },
     },
+    emergencyContact: {
+      type: String,
+      validate(value) {
+        if (!validator.isMobilePhone(value, 'any', { strictMode: false })) {
+          throw new Error('Invalid emergency contact number');
+        }
+      },
+    },
+    disease: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Doctor',
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-doctorSchema.plugin(toJSON);
-doctorSchema.plugin(paginate);
+// add plugin that converts mongoose to json
+patientSchema.plugin(toJSON);
+patientSchema.plugin(paginate);
 
 /**
  * Check if email is taken
@@ -73,14 +88,14 @@ doctorSchema.plugin(paginate);
  * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
  * @returns {Promise<boolean>}
  */
-doctorSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+patientSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
   return !!user;
 };
 
 /**
- * @typedef Doctor
+ * @typedef Patient
  */
-const Doctor = mongoose.model('Doctor', doctorSchema);
+const Patient = mongoose.model('Patient', patientSchema);
 
-module.exports = Doctor;
+module.exports = Patient;
