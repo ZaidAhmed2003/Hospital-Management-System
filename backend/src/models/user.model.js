@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const { toJSON, paginate } = require('./plugins');
+const { roles } = require('../config/roles');
 
-
-const userSchema = new mongoose.Schema(
+const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -15,55 +17,75 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      // Basic email format validation (consider a more robust library if needed)
-      match: [/\S+@\S+\.\S+/, 'is invalid'],
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
     },
     password: {
       type: String,
       required: true,
-      minlength: 6, // Enforce a minimum password length
-      private: true, // Indicates field should not be sent in response by default (requires plugin or manual handling)
+      trim: true,
+      minlength: 8,
+      validate(value) {
+        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+          throw new Error('Password must contain at least one letter and one number');
+        }
+      },
+      private: true, // used by the toJSON plugin
+    },
+    role: {
+      type: String,
+      enum: roles,
+      default: 'user',
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields automatically
-    toJSON: {
-      // Remove password field when converting schema to JSON
-      transform: function (doc, ret) {
-        delete ret.password;
-        return ret;
-      },
-    },
-    toObject: {
-      // Remove password field when converting schema to Object
-       transform: function (doc, ret) {
-        delete ret.password;
-        return ret;
-      },
-    }
+    timestamps: true,
   }
 );
 
-// Hash password before saving the user document
-userSchema.pre('save', async function (next) {
-  // Only hash the password if it has been modified (or is new)
-  if (!this.isModified('password')) return next();
+// add plugin that converts mongoose to json
+userSchema.plugin(toJSON);
+userSchema.plugin(paginate);
 
-  try {
-    // Generate a salt and hash the password
-    const salt = await bcrypt.genSalt(10); // 10 rounds is generally recommended
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error); // Pass error to the next middleware/handler
-  }
-});
-
-// Method to compare entered password with the hashed password in the database
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+/**
+ * Check if email is taken
+ * @param {string} email - The user's email
+ * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+ * @returns {Promise<boolean>}
+ */
+userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
 };
 
+/**
+ * Check if password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
+};
+
+userSchema.pre('save', async function (next) {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+/**
+ * @typedef User
+ */
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
