@@ -84,6 +84,6 @@ module.exports = {
   queryUsers,
   getUserById,
   getUserByEmail,
-  updateUserById,
+  updateUserById, 
   deleteUserById,
 };

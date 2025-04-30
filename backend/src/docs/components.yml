@@ -19,6 +19,115 @@ components:
         name: fake name
         role: user
 
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        address:
+          type: string
+        specialty:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        id: 5ebac534954b54139806c112
+        firstName: John
+        lastName: Doe
+        age: 30
+        gender: male
+        address: 123 Main St
+        specialty: General Practice
+        phoneNumber: 123-456-7890
+        email: john.doe@example.com
+        createdAt: 2023-01-01T00:00:00Z
+        updatedAt: 2023-01-01T00:00:00Z
+
+    Room:
+      type: object
+      properties:
+        roomNo:
+          type: string
+        roomType:
+          type: string
+          enum: [General, Semi-Private, Private, ICU]
+        status:
+          type: string
+          enum: [Available, Occupied, Maintenance]
+          default: Available
+        roomCharge:
+          type: number
+          minimum: 0
+
+      required:
+        - roomNo
+        - roomType
+        - roomCharge
+      example:
+        roomNo: '202B'
+        roomType: 'Private'
+        status: 'Available'
+        roomCharge: 5000
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        emergencyContact:
+          type: string
+        medicalHistory:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        firstName: Jane
+        lastName: Doe
+        age: 28
+        gender: female
+        address: 456 Elm St
+        phoneNumber: '+923001234567'
+        email: janedoe@example.com
+        emergencyContact: '+923001112233'
+        medicalHistory: Allergic to penicillin
+        createdAt: 2023-01-01T00:00:00Z
+        updatedAt: 2023-01-01T00:00:00Z
+
     Token:
       type: object
       properties:

@@ -64,13 +64,16 @@ const patientSchema = mongoose.Schema(
     },
     disease: {
       type: String,
-      required: true,
       trim: true,
     },
     doctor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Doctor',
       required: true,
+    },
+    medicalHistory: {
+      type: String,
+      trim: true,
     },
   },
   {
