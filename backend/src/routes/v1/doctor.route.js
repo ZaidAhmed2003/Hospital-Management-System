@@ -213,13 +213,24 @@ module.exports = router;
  *                 enum: [male, female, other, unknown]
  *               address:
  *                 type: string
- *               speciality:
+ *               specialty:
  *                 type: string
  *               phoneNumber:
  *                 type: string
  *               email:
  *                 type: string
  *                 format: email
+ *             example:
+ *               firstName: John
+ *               lastName: Doe
+ *               age: 35
+ *               gender: male
+ *               address: 123 Main St
+ *               specialty: Cardiology
+ *               phoneNumber: "+923302411283"
+ *               email: johndoe@example.com
+ * 
+ * 
  *     responses:
  *       "200":
  *         description: Doctor updated

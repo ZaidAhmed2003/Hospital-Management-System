@@ -39,7 +39,8 @@ const updateDoctor = {
     .keys({
       firstName: Joi.string(),
       lastName: Joi.string(),
-      age: Joi.number().integer().min(25).max(80),
+      age: Joi.number().integer().min(0).max(80),
+      gender: Joi.string(),
       email: Joi.string().email(),
       specialty: Joi.string().optional(),
       phoneNumber: Joi.string().optional(),

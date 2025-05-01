@@ -53,7 +53,7 @@ const getDoctorByEmail = async (email) => {
  * @returns {Promise<Doctor>}
  */
 const updateDoctorById = async (doctorId, updateBody) => {
-  const doctor = await getDocterById(doctorId);
+  const doctor = await getDoctorById(doctorId);
   if (!doctor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Doctor not found');
   }
@@ -71,7 +71,7 @@ const updateDoctorById = async (doctorId, updateBody) => {
  * @returns {Promise<Doctor>}
  */
 const deleteDoctorById = async (doctorId) => {
-  const doctor = await getDocterById(doctorId);
+  const doctor = await getDoctorById(doctorId);
   if (!doctor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Doctor not found');
   }
