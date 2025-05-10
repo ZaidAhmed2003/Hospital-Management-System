@@ -1,36 +1,94 @@
-// src/pages/auth/Login.jsx
-import { useState } from 'react';
-import { login } from './../../constants/api';
-import { loginSuccess } from './../../features/auth/authSlice';
-import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginAsync } from "@/features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import {
+  showSuccess,
+  showError,
+  showLoading,
+  closeLoading,
+} from "@/utils/toast";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 const Login = () => {
   const dispatch = useDispatch();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Show loading toast
+    const loadingToastId = showLoading("Logging in...");
+
     try {
-      const { data } = await login(form);
-      dispatch(loginSuccess(data));
-      toast.success('Login successful');
+      // Dispatch the login action
+      const result = await dispatch(loginAsync(form));
+
+      // Close the loading toast once the login attempt completes
+      closeLoading(loadingToastId);
+
+      // Handle the response and show success or error
+      if (result.meta.requestStatus === "fulfilled") {
+        showSuccess("Login successful");
+        navigate("/"); // Redirect to dashboard or home
+      } else {
+        showError("Login failed");
+      }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      // Close the loading toast if there’s an error
+      closeLoading(loadingToastId);
+      showError("An error occurred. Please try again.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-20 space-y-4">
-      <h2 className="text-xl font-bold">Login</h2>
-      <input type="email" placeholder="Email" value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        className="w-full p-2 border rounded" />
-      <input type="password" placeholder="Password" value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-        className="w-full p-2 border rounded" />
-      <button type="submit" className="w-full p-2 bg-blue-600 text-white rounded">Login</button>
-    </form>
+    <>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-r from-amber-200 to-yellow-500">
+        <div className="flex flex-col items-center max-w-96 justify-center p-5 bg-white shadow-[15px_15px_0px_0px_rgba(0,_0,_0,_1)] rounded-2xl">
+          <h2 className="text-2xl text-center font-bold mb-10">
+            Hospital Management System
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4 w-full">
+            <div className="relative">
+              <input
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full p-3 pl-12 rounded-lg bg-gray-200 text-gray-700 focus:outline-none focus:ring-0 transition duration-300"
+              />
+              <span className="absolute left-3 top-4 text-gray-400">
+                <FaEnvelope />
+              </span>
+            </div>
+
+            {/* Password Input */}
+            <div className="relative">
+              <input
+                type="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="w-full p-3 pl-12 rounded-lg bg-gray-200 text-gray-700 focus:outline-none focus:ring-0 transition duration-300"
+              />
+              <span className="absolute left-3 top-4 text-gray-400">
+                <FaLock />
+              </span>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full p-3 bg-yellow-500 text-white rounded-lg hover:bg-black cursor-pointer focus:outline-none transition duration-300 disabled:opacity-50"
+              disabled={status === "loading"}
+            >
+              {status === "loading" ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
   );
 };
 

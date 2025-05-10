@@ -16,6 +16,13 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 
+// CORS configuration
+const corsOptions = {
+  origin: "http://localhost:5173",  // Specify your frontend URL here
+  credentials: true,                // Allow cookies and authorization headers
+  methods: ["GET", "POST", "PUT", "DELETE"],  // Allow these HTTP methods
+};
+
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -38,7 +45,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-app.use(cors());
+app.use(cors(corsOptions));
 app.options('*', cors());
 
 // jwt authentication
